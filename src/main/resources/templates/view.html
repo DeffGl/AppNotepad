@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List Tasks</title>
+    <!-- Подключение Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div>
+        <h1 class="text-center">Список задач</h1>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover">
+                <thead class="thead-dark"></thead>
+                <tr>
+                    <th class="text-center">Название</th>
+                    <th class="text-center">Описание</th>
+                    <th class="text-center">Дата создания</th>
+                    <th class="text-center">Дата изменения</th>
+                    <th class="text-center">Статус выполнения</th>
+                </tr>
+                <tr th:each="task : ${tasks}">
+                    <td th:text="${task.name}" class="text-center"></td>
+                    <td th:text="${task.description}" class="text-center"></td>
+                    <td th:text="${task.createdDate}" class="text-center"></td>
+                    <td th:text="${task.modifiedDate}" class="text-center"></td>
+                    <td th:text="${task.completed}" class="text-center"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
