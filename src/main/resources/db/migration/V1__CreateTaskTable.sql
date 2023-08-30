@@ -5,6 +5,6 @@ CREATE TABLE tasks(
     description VARCHAR(10240),
     created_date TIMESTAMP NOT NULL,
     modified_date TIMESTAMP,
-    completed BOOLEAN NOT NULL
+    status VARCHAR(30) NOT NULL
 );
 
