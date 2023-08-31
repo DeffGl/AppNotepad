@@ -21,8 +21,8 @@ import java.util.*
 @Service
 class TaskServiceImpl(private val taskRepository: TaskRepository) : TaskService {
 
-    override fun findAllTasks(page: Int): Page<TaskDTO> {
-        val pageable: Pageable = PageRequest.of(page, 10, Sort.by("name"))
+    override fun findAllTasks(page: Int, field:String): Page<TaskDTO> {
+        val pageable: Pageable = PageRequest.of(page, 10, Sort.by(field))
         return taskRepository.findAll(pageable)
     }
 

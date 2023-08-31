@@ -7,18 +7,48 @@
     <script src="https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="container d-flex justify-content-center align-items-center vh-100" id="taskContainer">
-    <div>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="text-center" style="padding-right: 50px; ">
+        <form id="filterForm">
+            <div>
+                <label for="searchName">Название:</label>
+                <input type="text" id="searchName" name="searchContent">
+            </div>
+            <div>
+                <label for="searchDescription">Описание:</label>
+                <input type="text" id="searchDescription" name="searchContent">
+            </div>
+            <div style="padding-top: 10px;">
+                <label for="completed">Флаг выполнения:</label>
+                <input type="checkbox" id="completed" name="completed">
+            </div>
+            <div>
+                <button >Применить фильтр</button>
+            </div>
+            <div style="padding-top: 10px;">
+                <button> Сбросить фильтр</button>
+            </div>
+        </form>
+        <div class="text-center" style="padding-top: 20px;">
+            <button style="margin: 10px 5px;" th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                    th:hx-get="${'/tasks?page=' + (pageNum - 1)}"
+                    th:hx-target="'#taskContainer'"
+                    th:hx-swap="innerHTML"
+                    th:text="${pageNum}">
+            </button>
+        </div>
+    </div>
+    <div id="taskContainer">
         <h1 class="text-center">Список задач</h1>
         <div class="table-responsive"  id="taskTable" style="min-height: 821px;">
             <table class="table table-striped table-bordered table-hover" >
                 <thead class="thead-dark">
                 <tr>
-                    <th class="text-center">Название</th>
-                    <th class="text-center">Описание</th>
-                    <th class="text-center">Дата создания</th>
-                    <th class="text-center">Дата изменения</th>
-                    <th class="text-center">Статус выполнения</th>
+                    <th class="text-center" th:hx-get="${'/tasks?page=' + (page) + '&field=name'}" th:hx-target="'#taskContainer'">Название</th>
+                    <th class="text-center" th:hx-get="${'/tasks?page=' + (page) + '&field=description'}" th:hx-target="'#taskContainer'">Описание</th>
+                    <th class="text-center" th:hx-get="${'/tasks?page=' + (page) + '&field=createdDate'}" th:hx-target="'#taskContainer'">Дата создания</th>
+                    <th class="text-center" th:hx-get="${'/tasks?page=' + (page) + '&field=modifiedDate'}" th:hx-target="'#taskContainer'">Дата изменения</th>
+                    <th class="text-center" th:hx-get="${'/tasks?page=' + (page) + '&field=status'}" th:hx-target="'#taskContainer'">Статус выполнения</th>
                 </tr>
                 </thead>
                 <tr th:each="task : ${tasks}">
@@ -32,13 +62,6 @@
                     </td>
                 </tr>
             </table>
-        </div>
-        <div class="text-center">
-            <button th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-                    th:hx-get="${'/tasks?page=' + (pageNum - 1)}"
-                    th:hx-target="'#taskContainer'"
-                    th:text="${pageNum}">
-            </button>
         </div>
     </div>
 </div>

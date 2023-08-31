@@ -14,8 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam
 class TaskViewController(private val taskServiceImpl: TaskServiceImpl) {
 
     @GetMapping
-    fun viewTasks(model: Model, @RequestParam page: Int): String {
-        val taskPage: Page<TaskDTO> = taskServiceImpl.findAllTasks(page)
+    fun viewTasks(
+        model: Model,
+        @RequestParam(required = false, defaultValue = "0") page: Int,
+        @RequestParam(required = false, defaultValue = "name") field: String
+    ): String {
+        val taskPage: Page<TaskDTO> = taskServiceImpl.findAllTasks(page, field)
         model.addAttribute("tasks", taskPage.content)
         model.addAttribute("totalPages", taskPage.totalPages)
         model.addAttribute("page", page)
