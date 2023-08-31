@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>List Tasks</title>
-    <!-- Подключение Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="container d-flex justify-content-center align-items-center vh-100">
+<div class="container d-flex justify-content-center align-items-center vh-100" id="taskContainer">
     <div>
         <h1 class="text-center">Список задач</h1>
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered table-hover">
-                <thead class="thead-dark"></thead>
+        <div class="table-responsive"  id="taskTable" style="min-height: 821px;">
+            <table class="table table-striped table-bordered table-hover" >
+                <thead class="thead-dark">
                 <tr>
                     <th class="text-center">Название</th>
                     <th class="text-center">Описание</th>
@@ -20,14 +20,25 @@
                     <th class="text-center">Дата изменения</th>
                     <th class="text-center">Статус выполнения</th>
                 </tr>
+                </thead>
                 <tr th:each="task : ${tasks}">
                     <td th:text="${task.name}" class="text-center"></td>
                     <td th:text="${task.description}" class="text-center"></td>
                     <td th:text="${task.createdDate}" class="text-center"></td>
                     <td th:text="${task.modifiedDate}" class="text-center"></td>
-                    <td th:text="${task.status}" class="text-center"></td>
+                    <td class="text-center">
+                        <span th:if="${task.status.toString() == 'COMPLETED'}">Завершено</span>
+                        <span th:unless="${task.status.toString() == 'COMPLETED'}">Не завершено</span>
+                    </td>
                 </tr>
             </table>
+        </div>
+        <div class="text-center">
+            <button th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                    th:hx-get="${'/tasks?page=' + (pageNum - 1)}"
+                    th:hx-target="'#taskContainer'"
+                    th:text="${pageNum}">
+            </button>
         </div>
     </div>
 </div>

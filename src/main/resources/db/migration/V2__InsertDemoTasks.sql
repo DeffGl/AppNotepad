@@ -3,4 +3,14 @@ VALUES ('80e0f6ca-465b-11ee-be56-0242ac120002', 'Task 1', 'Description for task 
        ('a6cdfc0c-465b-11ee-be56-0242ac120002', 'Task 2', 'Description for task 2', NOW(), 'COMPLETED'),
        ('aa2d5352-465b-11ee-be56-0242ac120002', 'Task 3', 'Description for task 3', NOW(), 'INCOMPLETE'),
        ('ad64a0ca-465b-11ee-be56-0242ac120002', 'Task 4', 'Description for task 4', NOW(), 'COMPLETED'),
-       ('b03585a8-465b-11ee-be56-0242ac120002', 'Task 5', 'Description for task 5', NOW(), 'INCOMPLETE');
+       ('b03585a8-465b-11ee-be56-0242ac120002', 'Task 5', 'Description for task 5', NOW(), 'INCOMPLETE'),
+       ('483ec776-47f4-11ee-be56-0242ac120002', 'Task 6', 'Description for task 6', NOW(), 'COMPLETED'),
+       ('4eaaaa12-47f4-11ee-be56-0242ac120002', 'Task 7', 'Description for task 7', NOW(), 'INCOMPLETE'),
+       ('52bb4a58-47f4-11ee-be56-0242ac120002', 'Task 8', 'Description for task 8', NOW(), 'COMPLETED'),
+       ('5581c9d8-47f4-11ee-be56-0242ac120002', 'Task 9', 'Description for task 9', NOW(), 'INCOMPLETE'),
+       ('5899d638-47f4-11ee-be56-0242ac120002', 'Task 10', 'Description for task 10', NOW(), 'COMPLETED'),
+       ('5bb56d0a-47f4-11ee-be56-0242ac120002', 'Task 11', 'Description for task 11', NOW(), 'COMPLETED'),
+       ('5f9ce40c-47f4-11ee-be56-0242ac120002', 'Task 12', 'Description for task 12', NOW(), 'COMPLETED'),
+       ('62a30618-47f4-11ee-be56-0242ac120002', 'Task 13', 'Description for task 13', NOW(), 'INCOMPLETE'),
+       ('65666566-47f4-11ee-be56-0242ac120002', 'Task 14', 'Description for task 14', NOW(), 'COMPLETED'),
+       ('68241988-47f4-11ee-be56-0242ac120002', 'Task 15', 'Description for task 15', NOW(), 'INCOMPLETE');

@@ -30,7 +30,7 @@ class TaskExceptionController {
 
     @ExceptionHandler(TaskNotSaveDbException::class, TaskNotUpdatedException::class)
     fun handleTaskSaveDbException(ex: TaskNotSaveDbException, request: WebRequest): ResponseEntity<ErrorMessage>{
-        log.error("${ex.message}: ${ex.cause?.message}")
+        if(ex.cause?.message == null) log.error(ex.message) else log.error("${ex.message}: ${ex.cause?.message}")
         val errorMessage = ErrorMessage(LocalDateTime.now(),
             HttpStatus.BAD_REQUEST.value(),
             ex.message.toString(),
