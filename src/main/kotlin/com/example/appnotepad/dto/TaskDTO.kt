@@ -1,10 +1,11 @@
 package com.example.appnotepad.dto
 
-import java.time.LocalDate
+import com.example.appnotepad.entity.enum.Status
+import java.time.LocalDateTime
 
 data class TaskDTO (val name: String,
                     val description: String?,
-                    val createdDate: LocalDate,
-                    val modifiedDate: LocalDate?,
-                    val status: String
+                    val createdDate: LocalDateTime,
+                    val modifiedDate: LocalDateTime?,
+                    val status: Status
 )

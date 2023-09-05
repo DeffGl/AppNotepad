@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List Tasks</title>
+</head>
+<body>
+<div id="taskContainer">
+    <div id="tableFragment">
+        <h1 class="text-center">Список задач</h1>
+        <div class="table-responsive" id="taskTable" style="min-height: 821px;">
+            <table class="table table-striped table-bordered table-hover">
+                <thead class="thead-dark">
+                <tr>
+                    <th id="fieldName" class="text-center"
+                        onclick="setField('name'); submitForm();">Название
+                    </th>
+                    <th id="fieldDescription" class="text-center"
+                        onclick="setField('description'); submitForm();">Описание
+                    </th>
+                    <th class="text-center"
+                        onclick="setField('createdDate'); submitForm();">Дата создания
+                    </th>
+                    <th class="text-center"
+                        onclick="setField('modifiedDate'); submitForm();">Дата изменения
+                    </th>
+                    <th class="text-center"
+                        onclick="setField('status'); submitForm();">Статус выполнения
+                    </th>
+                </tr>
+                </thead>
+                <tr th:each="task : ${tasks}">
+                    <td th:text="${task.name}" class="text-center"></td>
+                    <td th:text="${task.description}" class="text-center"></td>
+                    <td th:text="${#temporals.format(task.createdDate, 'dd-MM-yyyy HH:mm:ss')}"
+                        class="text-center"></td>
+                    <td th:text="${#temporals.format(task.modifiedDate, 'dd-MM-yyyy HH:mm:ss')}"
+                        class="text-center"></td>
+                    <td class="text-center">
+                        <span th:if="${task.status.toString() == 'COMPLETED'}">Завершено</span>
+                        <span th:unless="${task.status.toString() == 'COMPLETED'}">Не завершено</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="text-center" style="padding-top: 20px;" th:if="${totalPages > 0}">
+            <button style="margin: 10px 5px;" th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                    th:text="${pageNum}"
+                    th:attr="page=${pageNum - 1}"
+                    onclick="setPage(this.getAttribute('page')); submitForm();">
+            </button>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+
+    let field = 'name'
+    let page = 0
+
+    function setPage(value){
+        page = value
+    }
+
+    function setField(value) {
+        field = value
+    }
+
+    function getValues() {
+        let taskName = document.getElementById('searchName').value
+        let taskDescription = document.getElementById('searchDescription').value
+        let taskStatus = document.getElementById('status').value
+        return {
+            taskName,
+            taskDescription,
+            taskStatus
+        }
+    }
+
+    function submitForm() {
+        let values = getValues()
+        let url = `/tasks?page=${page}&field=${field}&name=${values.taskName}&description=${values.taskDescription}&status=${values.taskStatus}`;
+        htmx.ajax('GET', url, '#taskContainer')
+    }
+
+</script>
+</body>
+</html>

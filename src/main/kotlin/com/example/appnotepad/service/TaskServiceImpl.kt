@@ -21,10 +21,21 @@ import java.util.*
 @Service
 class TaskServiceImpl(private val taskRepository: TaskRepository) : TaskService {
 
-    override fun findAllTasks(page: Int, field:String): Page<TaskDTO> {
+    override fun findAllFilteredTasks(page: Int, field: String, name: String?, description: String?, status: String?): Page<TaskDTO> {
         val pageable: Pageable = PageRequest.of(page, 10, Sort.by(field))
-        return taskRepository.findAll(pageable)
+        return if (name.isNullOrBlank() && description.isNullOrBlank() && (status.isNullOrBlank() || status == "all"))
+            taskRepository.findAll(pageable)
+        else if (status == "all") taskRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(
+            name,
+            description,
+            pageable)
+        else taskRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndStatusEquals(
+            name,
+            description,
+            if (status == "completed") Status.COMPLETED else Status.INCOMPLETE,
+            pageable)
     }
+
 
     override fun createTask(createdTask: Task): Task {
         return saveTask(createdTask) { task ->

@@ -14,5 +14,5 @@ interface TaskService {
     fun findTask(id: UUID): Task
     fun copyTask(id: UUID, updatedTask: Task): Task
     fun saveTask(task: Task, action: (Task) -> Task): Task
-    fun findAllTasks(page: Int, field: String): Page<TaskDTO>
+    fun findAllFilteredTasks(page: Int, field: String, name: String?, description: String?, status: String?): Page<TaskDTO>
 }
