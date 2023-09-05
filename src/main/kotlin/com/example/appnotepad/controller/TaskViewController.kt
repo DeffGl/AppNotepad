@@ -23,7 +23,6 @@ class TaskViewController(private val taskServiceImpl: TaskServiceImpl) {
         @RequestParam(required = false) name: String? = null,
         @RequestParam(required = false) description: String? = null,
         @RequestParam(required = false) status: String? = null,
-        @RequestBody(required = false) fieldd: String?,
         request: HttpServletRequest
     ): String {
 
