@@ -1,5 +1,6 @@
 package com.example.appnotepad.service
 
+import com.example.appnotepad.actuator.TaskMetricsEndpoint
 import com.example.appnotepad.dto.TaskDTO
 import com.example.appnotepad.entity.Task
 import com.example.appnotepad.entity.enum.Status
@@ -19,7 +20,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Service
-class TaskServiceImpl(private val taskRepository: TaskRepository) : TaskService {
+class TaskServiceImpl(private val taskRepository: TaskRepository, private val taskMetricsEndpoint: TaskMetricsEndpoint) : TaskService {
 
     override fun findAllFilteredTasks(page: Int, field: String, name: String?, description: String?, status: String?): Page<TaskDTO> {
         val pageable: Pageable = PageRequest.of(page, 10, Sort.by(field))
@@ -38,17 +39,21 @@ class TaskServiceImpl(private val taskRepository: TaskRepository) : TaskService 
 
 
     override fun createTask(createdTask: Task): Task {
-        return saveTask(createdTask) { task ->
+        val task: Task = saveTask(createdTask) { task ->
             taskRepository.save(task)
         }
+        taskMetricsEndpoint.incrementCreatedTasks()
+        return task
     }
 
     override fun updateTask(id: UUID, updatedTask: Task): Task {
         val newTask = copyTask(id, updatedTask)
         if (newTask.status == Status.COMPLETED) throw TaskNotUpdatedException("Нельзя редактировать выполненную задачу")
-        return saveTask(newTask) { task ->
+        val task: Task = saveTask(newTask) { task ->
             taskRepository.save(task)
         }
+        taskMetricsEndpoint.incrementModifiedTasks()
+        return task
     }
 
     override fun updateStatus(id: UUID, newStatus: Status): Task? {
@@ -61,6 +66,7 @@ class TaskServiceImpl(private val taskRepository: TaskRepository) : TaskService 
     override fun deleteTask(id: UUID): String {
         if (findTask(id).status == Status.COMPLETED) throw TaskNotDeleteException("Нельзя удалить выполненную задачу")
         taskRepository.deleteById(id)
+        taskMetricsEndpoint.incrementDeletedTasks()
         return "Задача успешно удалена"
     }
 
