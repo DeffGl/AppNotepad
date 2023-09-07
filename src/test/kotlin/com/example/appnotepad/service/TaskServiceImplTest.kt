@@ -5,9 +5,15 @@ import com.example.appnotepad.entity.Task
 import com.example.appnotepad.entity.enum.Status
 import com.example.appnotepad.repository.TaskRepository
 import com.example.appnotepad.repository.postgres
+import com.example.appnotepad.util.exceptions.TaskNotDeleteException
+import com.example.appnotepad.util.exceptions.TaskNotFoundException
+import com.example.appnotepad.util.exceptions.TaskNotSaveDbException
+import com.example.appnotepad.util.exceptions.TaskNotUpdatedException
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.relational.core.conversion.DbActionExecutionException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -188,45 +195,132 @@ internal class TaskServiceImplTest {
     }
 
     @Test
-    fun createTask() {
+    fun createTaskAnd_testTaskNotSaveDbException() {
+        val taskName = "Task"
+        val task  = Task(null, taskName)
+        val taskWithDuplicateName = Task(null, taskName)
+
+        val createdTask = taskService.createTask(task)
+        val foundTask = taskRepository.findById(createdTask.id!!)
+
+        assertEquals(task.name, foundTask.get().name)
+        assertThrows(TaskNotSaveDbException::class.java){
+            taskService.createTask(taskWithDuplicateName)
+        }
     }
 
     @Test
     fun updateTask() {
+        val task  = Task(null, "Task", "Original Description")
+        val newDescription = "Updated Description"
+
+        val createdTask = taskRepository.save(task)
+        val updatedTask = taskRepository.findById(createdTask.id!!).get().copy(description = newDescription)
+        val savedTask = taskService.updateTask(updatedTask.id!!, updatedTask)
+
+        assertEquals(createdTask.id, savedTask.id)
+        assertEquals(newDescription, savedTask.description)
+    }
+
+    @Test
+    fun updateTask_testTaskNotUpdatedException(){
+        val task  = Task(null, "Task", "Original Description", status = Status.COMPLETED)
+        val newDescription = "Updated Description"
+
+        val createdTask = taskRepository.save(task)
+        val updatedTask = taskRepository.findById(createdTask.id!!).get().copy(description = newDescription)
+        assertThrows(TaskNotUpdatedException::class.java){
+           taskService.updateTask(updatedTask.id!!, updatedTask)
+        }
+
     }
 
     @Test
     fun updateStatus() {
+        val status = Status.INCOMPLETE
+        val task  = Task(null, "Task", "Original Description", status = status)
+
+        val createdTask = taskRepository.save(task)
+        val updatedTask = taskService.updateStatus(createdTask.id!!, Status.COMPLETED)
+
+        assertNotEquals(status, updatedTask?.status)
     }
 
     @Test
     fun deleteTask() {
+        val task = Task(null, "TaskToDelete")
+        val savedTask = taskRepository.save(task)
+
+        taskService.deleteTask(savedTask.id!!)
+
+        val deletedTask = taskRepository.findById(savedTask.id!!)
+        assertEquals(false, deletedTask.isPresent)
+
+    }
+
+    @Test
+    fun deleteTask_testTaskNotDeleteException(){
+        val task  = Task(null, "Task", "Original Description", status = Status.COMPLETED)
+        val savedTask = taskRepository.save(task)
+
+        assertThrows(TaskNotDeleteException::class.java){
+            taskService.deleteTask(savedTask.id!!)
+        }
     }
 
     @Test
     fun findTask() {
+        val task  = Task(null, "Task")
+        val savedTask = taskRepository.save(task)
+
+        val foundTask = taskService.findTask(savedTask.id!!)
+        assertEquals(savedTask.id, foundTask.id)
+    }
+
+    @Test
+    fun findTask_testTaskNotFoundException(){
+        val task  = Task(null, "Task")
+        val savedTask = taskRepository.save(task)
+        taskRepository.deleteById(savedTask.id!!)
+
+        assertThrows(TaskNotFoundException::class.java){
+            taskService.findTask(savedTask.id!!)
+        }
     }
 
     @Test
     fun copyTask() {
+        val task = Task(null, "Task")
+        val savedTask = taskRepository.save(task)
+
+        val updatedName = "updatedName"
+        val updatedDescription = "updatedDescription"
+        val updatedTask = Task (savedTask.id, updatedName, updatedDescription, savedTask.createdDate, savedTask.modifiedDate, savedTask.status)
+        val copiedTask = taskService.copyTask(savedTask.id!!, updatedTask)
+
+        assertTrue(isTasksEqual(updatedTask, copiedTask))
+    }
+
+    fun isTasksEqual(expected: Task, actual: Task): Boolean{
+        if (expected.id != actual.id ||
+            expected.name != actual.name ||
+            expected.description != actual .description||
+            expected.createdDate != actual.createdDate ||
+            expected.status != actual.status){
+            return false
+        }
+        return true
     }
 
     @Test
     fun saveTask() {
+        val task = Task(null, "Task")
+        val savedTask = taskService.saveTask(task){
+            taskRepository.save(task)
+        }
+        val foundTask = taskRepository.findById(savedTask.id!!)
+        assertEquals(savedTask.id, foundTask.get().id)
+        assertEquals(savedTask.name, foundTask.get().name)
     }
 }
 
-/*
-val count = jdbcTemplate.queryForObject(
-    "SELECT COUNT(*) FROM tasks",
-    Int::class.java
-)
-
-val tasksss = jdbcTemplate.queryForList("select * from tasks")
-
-val tasks = taskService.findALl().toList()
-
-
-assertEquals(tasks.size, tasksss.size)
-
-assertEquals(count, 15)*/
