@@ -20,23 +20,44 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Service
-class TaskServiceImpl(private val taskRepository: TaskRepository, private val taskMetricsEndpoint: TaskMetricsEndpoint) : TaskService {
+class TaskServiceImpl(
+    private val taskRepository: TaskRepository,
+    private val taskMetricsEndpoint: TaskMetricsEndpoint
+) : TaskService {
 
-    override fun findAllFilteredTasks(page: Int, field: String, name: String?, description: String?, status: String?): Page<TaskDTO> {
+    override fun findAllFilteredTasks(
+        page: Int,
+        field: String,
+        name: String?,
+        description: String?,
+        status: String?
+    ): Page<TaskDTO> {
         val pageable: Pageable = PageRequest.of(page, 10, Sort.by(field))
         return if (name.isNullOrBlank() && description.isNullOrBlank() && (status.isNullOrBlank() || status == "all"))
-            taskRepository.findAll(pageable)
-        else if (status == "all") taskRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(
+            taskRepository.findAll(pageable).map { mapToTaskDTO(it) }
+        else if (status.isNullOrBlank() || status == "all") taskRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(
             name,
             description,
-            pageable)
+            pageable
+        ).map { mapToTaskDTO(it) }
         else taskRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndStatusEquals(
             name,
             description,
             if (status == "completed") Status.COMPLETED else Status.INCOMPLETE,
-            pageable)
+            pageable
+        ).map { mapToTaskDTO(it) }
     }
 
+
+    fun mapToTaskDTO(task: Task): TaskDTO {
+        return TaskDTO(
+            task.name,
+            task.description,
+            task.createdDate,
+            task.modifiedDate,
+            task.status
+        )
+    }
 
     override fun createTask(createdTask: Task): Task {
         val task: Task = saveTask(createdTask) { task ->

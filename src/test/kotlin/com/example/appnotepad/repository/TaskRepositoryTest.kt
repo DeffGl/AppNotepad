@@ -1,6 +1,7 @@
 package com.example.appnotepad.repository
 
 import com.example.appnotepad.entity.Task
+import com.example.appnotepad.entity.enum.Status
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -136,19 +139,80 @@ internal class TaskRepositoryTest {
         }
     }
 
-/*
-
     @Test
     fun findAll() {
+        val tasks: List<Task> = taskRepository.findAll().sortedBy { task -> task.name }
         val pageable = PageRequest.of(0, 10, Sort.by("name"))
-        val tasks = taskRepository.findAll().toList().stream().sorted { o1, o2 -> o1.name.compareTo(o2.name) }.toList()
         val page = taskRepository.findAll(pageable)
 
-        assertEquals(10, page.content.size)
-        assertEquals(page.content[0].name, tasks[0].name)
-
+        if (tasks.size in 0 until 10) {
+            assertEquals(page.content.size, tasks.size)
+        } else {
+            assertTrue(page.content.size == 10)
+        }
+        if (tasks.isNotEmpty()){
+            assertEquals(tasks[0].name, page.content[0].name)
+        }
     }
-*/
+
+    @Test
+    fun findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndStatusEquals(){
+        val inputName = "Task"
+        val inputDescription = "Description for task"
+        val completedTask: List<Task> = taskRepository.findAll()
+            .sortedBy { task -> task.name }
+            .filter { task-> task.name.contains(inputName, ignoreCase = true) }
+            .filter { task ->  task.description?.contains(inputDescription, ignoreCase = true)?: false}
+            .filter { task -> task.status == Status.COMPLETED}
+        val incompleteTask: List<Task> = taskRepository.findAll()
+            .sortedBy { task -> task.name }
+            .filter { task-> task.name.contains(inputName, ignoreCase = true) }
+            .filter { task ->  task.description?.contains(inputDescription, ignoreCase = true)?: false}
+            .filter { task -> task.status == Status.INCOMPLETE}
+        val pageable = PageRequest.of(0, 10, Sort.by("name"))
+
+
+        val completedTaskByFilter = taskRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndStatusEquals(
+            inputName,
+            inputDescription,
+            Status.COMPLETED,
+            pageable
+        )
+        val incompleteTaskByFilter = taskRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndStatusEquals(
+            inputName,
+            inputDescription,
+            Status.INCOMPLETE,
+            pageable
+        )
+
+        assertEquals(completedTask.size, completedTaskByFilter.content.size)
+        assertEquals(completedTask[0].name, completedTaskByFilter.content[0].name)
+
+        assertEquals(incompleteTask.size, incompleteTaskByFilter.content.size)
+        assertEquals(incompleteTask[0].name, incompleteTaskByFilter.content[0].name)
+    }
+
+    @Test
+    fun findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(){
+        val inputName = "Task"
+        val inputDescription = "Description for task"
+        val pageable = PageRequest.of(0, 10, Sort.by("name"))
+        val allTask: List<Task> = taskRepository.findAll()
+            .sortedBy { task -> task.name }
+            .filter { task-> task.name.contains(inputName, ignoreCase = true) }
+            .filter { task ->  task.description?.contains(inputDescription, ignoreCase = true)?: false}
+
+        val allTaskByFilter = taskRepository.findAllByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(
+            inputName,
+            inputDescription,
+            pageable
+        )
+
+        assertEquals(allTask.size, allTaskByFilter.content.size)
+        assertEquals(allTask[0].name, allTaskByFilter.content[0].name)
+    }
+
+
 
 
 }
