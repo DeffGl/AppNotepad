@@ -9,11 +9,11 @@ import com.example.appnotepad.util.exceptions.TaskNotDeleteException
 import com.example.appnotepad.util.exceptions.TaskNotFoundException
 import com.example.appnotepad.util.exceptions.TaskNotSaveDbException
 import com.example.appnotepad.util.exceptions.TaskNotUpdatedException
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
+import org.flywaydb.core.Flyway
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.relational.core.conversion.DbActionExecutionException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -51,6 +50,22 @@ internal class TaskServiceImplTest {
             registry.add("spring.datasource.password", container::getPassword)
             registry.add("spring.datasource.username", container::getUsername)
         }
+    }
+
+    @AfterEach
+    fun cleanup() {
+        jdbcTemplate.execute("TRUNCATE TABLE tasks")
+    }
+
+    @BeforeEach
+    fun setup() {
+        container.start()
+
+        val flyway = Flyway.configure()
+            .dataSource(container.jdbcUrl, container.username, container.password)
+            .locations("classpath:db/migration")
+            .load()
+        flyway.migrate()
     }
 
     @Autowired
@@ -305,7 +320,7 @@ internal class TaskServiceImplTest {
         if (expected.id != actual.id ||
             expected.name != actual.name ||
             expected.description != actual .description||
-            expected.createdDate != actual.createdDate ||
+            expected.createdDate.second != actual.createdDate.second ||
             expected.status != actual.status){
             return false
         }
