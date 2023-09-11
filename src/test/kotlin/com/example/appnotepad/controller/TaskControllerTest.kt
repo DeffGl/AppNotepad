@@ -234,7 +234,7 @@ internal class TaskControllerTest {
             .body("id", equalTo(id.toString()))
             .body("name", equalTo(task.name))
             .body("description", equalTo(task.description))
-            .body("status", equalTo(Status.COMPLETED.status))
+            .body("status", equalTo(Status.COMPLETED.name))
     }
 
     @Test

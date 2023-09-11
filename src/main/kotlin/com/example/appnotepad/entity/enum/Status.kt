@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import java.lang.IllegalArgumentException
 
-enum class Status(@JsonValue val status: String) {
-    COMPLETED("Выполнено"),
-    INCOMPLETE ("Не выполнено");
+enum class Status() {
+    COMPLETED,
+    INCOMPLETE;
 
     companion object {
 

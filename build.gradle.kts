@@ -27,6 +27,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
     implementation("org.jsoup:jsoup:1.16.1")
     testImplementation("io.github.ulfs:assertj-jsoup:0.1.4")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
