@@ -29,6 +29,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation ("io.rest-assured:kotlin-extensions:5.3.1")
+    testImplementation ("io.rest-assured:spring-mock-mvc:5.3.1")
     testImplementation ("io.rest-assured:json-path:5.3.1")
     testImplementation ("io.rest-assured:json-schema-validator:5.3.1")
     runtimeOnly("org.postgresql:postgresql")

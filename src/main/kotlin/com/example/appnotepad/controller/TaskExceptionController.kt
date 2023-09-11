@@ -12,7 +12,7 @@ import org.springframework.web.context.request.WebRequest
 import java.rmi.UnexpectedException
 import java.time.LocalDateTime
 
-@RestControllerAdvice
+@RestControllerAdvice(assignableTypes = [TaskController::class])
 class TaskExceptionController {
 
     var log: Logger = LoggerFactory.getLogger(this::class.java)
