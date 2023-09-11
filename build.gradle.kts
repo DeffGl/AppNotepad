@@ -27,6 +27,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jsoup:jsoup:1.16.1")
+    testImplementation("io.github.ulfs:assertj-jsoup:0.1.4")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation ("io.rest-assured:kotlin-extensions:5.3.1")
     testImplementation ("io.rest-assured:spring-mock-mvc:5.3.1")
