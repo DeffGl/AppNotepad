@@ -56,11 +56,6 @@ internal class TaskViewControllerTest {
         flyway.migrate()
     }
 
-    @AfterEach
-    fun cleanup() {
-        jdbcTemplate.execute("TRUNCATE TABLE tasks")
-    }
-
     @Test
     fun containerIsRunning() {
         assertTrue(container.isRunning)
