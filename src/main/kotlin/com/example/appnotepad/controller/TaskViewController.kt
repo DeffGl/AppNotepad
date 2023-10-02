@@ -1,7 +1,7 @@
 package com.example.appnotepad.controller
 
 import com.example.appnotepad.dto.TaskDTO
-import com.example.appnotepad.service.TaskServiceImpl
+import com.example.appnotepad.service.TaskService
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 @RequestMapping("/tasks")
-class TaskViewController(private val taskServiceImpl: TaskServiceImpl) {
+class TaskViewController(private val taskService: TaskService) {
 
     @GetMapping()
     fun getTasksBySortAndFilter(
@@ -25,7 +25,7 @@ class TaskViewController(private val taskServiceImpl: TaskServiceImpl) {
         @RequestHeader(name = "HX-Request", required = false) hxRequestHeader: String?
     ): String {
 
-        val taskPage: Page<TaskDTO> = taskServiceImpl.findAllFilteredTasks(page, field, name, description, status)
+        val taskPage: Page<TaskDTO> = taskService.findAllFilteredTasks(page, field, name, description, status)
         model.addAttribute("tasks", taskPage.content)
         model.addAttribute("totalPages", taskPage.totalPages)
         model.addAttribute("page", page)
